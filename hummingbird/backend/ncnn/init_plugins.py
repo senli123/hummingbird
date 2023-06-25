@@ -4,6 +4,8 @@
 import os
 import shutil
 
+from hummingbird.utils import get_file_path
+
 def get_ops_path() -> str:
     """_summary_
         获取ncnn库的路径
@@ -33,6 +35,22 @@ def get_onnx2ncnn_path() -> str:
         onnx2ncnn_path = '' if onnx2ncnn_path is None else onnx2ncnn_path
     return onnx2ncnn_path
 
+def get_torchscript2ncnn_path()-> str:
+    """获得pnnx的路径
+
+    Returns:
+        str: 返回找到的路径
+    """
+    candidates = ['./mmdeploy_pnnx', './mmdeploy_pnnx.exe']
+    pnnx_path = get_file_path(os.path.dirname(__file__), candidates)
+
+    if pnnx_path is None or not os.path.exists(pnnx_path):
+        pnnx_path = get_file_path('',candidates)
+    
+    if pnnx_path is None or not os.path.exists(pnnx_path):
+        pnnx_path = shutil.which('mmdeploy_pnnx')
+        pnnx_path = '' if pnnx_path is None else pnnx_path
+    return pnnx_path
 
 def get_ncnn2int8_path() -> str:
     ncnn2int8_path = shutil.which('ncnn2int8')
