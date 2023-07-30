@@ -1,6 +1,11 @@
 from abc import ABCMeta,abstractclassmethod
 import cv2
 import numpy as np
+
+class PreprocessFactory():
+    def create_preprocess(self,name,**kwargs):
+        return eval(name)(kwargs)
+    
 class BasePreprocess(metaclass = ABCMeta):
     
     @abstractclassmethod
@@ -11,7 +16,7 @@ class BasePreprocess(metaclass = ABCMeta):
         pass
 
 class ResizeWrapper(BasePreprocess):
-    def __init__(self,bgr2rgb,size):
+    def __init__(self,bgr2rgb,size,keep_ratio):
         self.bgr2rgb = bgr2rgb
         self.size = size
     def run(self, mat):

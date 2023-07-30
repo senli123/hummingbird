@@ -23,13 +23,16 @@ def onnx2tensorrt(  onnx_path: str,
                     int8_mode: bool = False,
                     int8_param: Optional[dict] = None,
                   ):
+    max_workspace_size = 1 << 28 
+    input_shapes = {"min_shape":[1,3,224,224],"opt_shape":[4,3,224,224],"max_shape":[8,3,224,224]}
     os.environ['CUDA_DEVICE'] = str(device_id)
     #加载plugin算子
     load_tensorrt_plugin()
     logger = trt.Logger()
     builder = trt.Builder(logger)
-    EXPLICIT_BATCH = 1 << (int)(
-        trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
+    # EXPLICIT_BATCH = 1 << (int)(
+    #     trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
+    EXPLICIT_BATCH = 1
     network = builder.create_network(EXPLICIT_BATCH)
 
     # parse onnx
@@ -61,12 +64,12 @@ def onnx2tensorrt(  onnx_path: str,
 
     profile = builder.create_optimization_profile()
 
-    for input_name, param in input_shapes.items():
-        min_shape = param['min_shape']
-        opt_shape = param['opt_shape']
-        max_shape = param['max_shape']
-        profile.set_shape(input_name, min_shape, opt_shape, max_shape)
-    config.add_optimization_profile(profile)
+    # for input_name, param in input_shapes.items():
+    #     min_shape = param['min_shape']
+    #     opt_shape = param['opt_shape']
+    #     max_shape = param['max_shape']
+    #     profile.set_shape(input_name, min_shape, opt_shape, max_shape)
+    # config.add_optimization_profile(profile)
 
     if fp16_mode:
         if version.parse(trt.__version__) < version.parse('8'):

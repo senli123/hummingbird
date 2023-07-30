@@ -1,5 +1,5 @@
 from abc import ABCMeta,abstractclassmethod
-from trt import TensorRTWrapper
+# from .trt import TensorRTWrapper
 class BaseBackend(metaclass = ABCMeta):
     
     @abstractclassmethod

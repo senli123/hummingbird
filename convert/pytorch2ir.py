@@ -14,7 +14,7 @@ class Pytorch2ir():
                verbose: bool = False):
 
         model = torch.load(pth_path)
-        dummy_input = torch.randn(input_shape)
+        dummy_input = torch.randn(input_shape,device='cuda')
         torch.onnx.export(model, dummy_input, ir_path, verbose=True, input_names=input_names, output_names=output_names)
 
     def torch2torchscript(self, pth_path: str,

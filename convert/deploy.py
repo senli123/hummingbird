@@ -21,21 +21,21 @@ class Pipeline:
         for cur_preprocess_arg in preprocess_args:
             preprocess_type = cur_preprocess_arg['type']
             preprocess_params = cur_preprocess_arg['params']
-            self.preprocess_pipeline.append(preprocess_factory.create_preprocess(preprocess_type, preprocess_params))
+            self.preprocess_pipeline.append(preprocess_factory.create_preprocess(preprocess_type, **preprocess_params))
         #注册backend
         backend_factory = BackendFactory()
         self.backend_pipeline = []
         for cur_backend_arg in backend_args:
             backend_type = cur_backend_arg['type']
             backend_params = cur_backend_arg['params']
-            self.backend_pipeline.append(backend_factory.create_backend(backend_type, backend_params))
+            self.backend_pipeline.append(backend_factory.create_backend(backend_type, **backend_params))
         #注册postprocess
         postprocess_factory = PostprocessFactory()
         self.postprocess_pipeline = []
         for cur_postprocess_arg in postprocess_args:
             postprocess_type = cur_postprocess_arg['type']
             postprocess_params = cur_postprocess_arg['params']
-            self.postprocess_pipeline.append(postprocess_factory.create_postprocess(postprocess_type, postprocess_params))
+            self.postprocess_pipeline.append(postprocess_factory.create_postprocess(postprocess_type, **postprocess_params))
 
     def infer(self, mat:cv2.Mat):
         for preprocess_node in self.preprocess_pipeline:
@@ -47,7 +47,7 @@ class Pipeline:
     def destory(self,):
         self.backend_pipeline[0].destory()
 
-def main(config_json_path):
+def main(config_json_path,image_path):
     if not os.path.exists(config_json_path):
         print("please check your input config_json_path")
         return
@@ -60,7 +60,7 @@ def main(config_json_path):
         infer_info = config_info['Infer']
         postprocess_info = config_info['Postprocess']
         #检查针对当前这种backcend，该convert类型是否支持
-        backend_type = infer_info['type']
+        backend_type = infer_info[0]['type']
         convert_type = convert_info['type']
         if backend_type not in BACKEND_IR_DICT.keys():
             print("we do not support this backend:{0}".format(backend_type))
@@ -83,18 +83,21 @@ def main(config_json_path):
         #进行backend_ir的转换
         backend_convert_type = backend_convert_info['type']
         backend_convert_params = backend_convert_info['params']
-        if backend_convert_type == "onnx2tensorrt":
-            onnx2tensorrt(backend_convert_params)
-        elif backend_convert_type == "wts2tensorrt":
-            wts2tensorrt(backend_convert_params)
+        #如果存在engine，则不生成
+        engine_path = backend_convert_params['output_file_prefix'] + '.engine'
+        if not os.path.exists(engine_path):
+            if backend_convert_type == "onnx2tensorrt":
+                onnx2tensorrt(**backend_convert_params)
+            elif backend_convert_type == "wts2tensorrt":
+                wts2tensorrt(**backend_convert_params)
 
         #转换成功之后创建推理pipeline，检查转换的结果
         pipeline = Pipeline(pth_path, preprocess_info,postprocess_info,infer_info)
-        image_path = config_info["config_info"]
         mat = cv2.imread(image_path)
         pipeline.infer(mat)
         pipeline.destory()
 
 
-config_json_path = "config/convert/example.json"
-main(config_json_path)
+config_json_path = "/workspace/lisen/tensorrt/my_tensorrt/config/convert/example.json"
+image_path = "/workspace/lisen/tensorrt/my_tensorrt/img/dog.jpg"
+main(config_json_path,image_path)
