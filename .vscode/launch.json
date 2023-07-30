@@ -1,0 +1,48 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+          "name": "gdb (Linux)",
+          "type": "cppdbg",
+          "request": "launch",
+          //	去bin文件夹找可执行文件
+         "program": "${workspaceFolder}/bin/demo",
+          //	每次执行命令行参数在argc中输入
+          "args": ["-s"], 
+        "stopAtEntry": false,
+          "cwd": "${workspaceFolder}",
+          "environment": [],
+          "externalConsole": false,
+          "MIMode": "gdb",
+          "setupCommands": [
+              {
+                  "description": "Enable pretty-printing for gdb",
+                  "text": "-enable-pretty-printing",
+                  "ignoreFailures": true
+              }
+          ],
+          "preLaunchTask": "task of build with gcc",
+          "miDebuggerPath": "/usr/bin/gdb",
+          
+          "additionalSOLibSearchPath": "/lib/x86_64-linux-gnu/",
+          "sourceFileMap": 
+          {
+              "/build/glibc-2ORdQG": "/usr/src/glibc"
+          }
+  
+      },
+      {
+        "name": "Python: 当前文件",
+        "type": "python",
+        "request": "launch",
+        "program": "${file}",
+        "console": "integratedTerminal",
+        //"python": "${command:python.interpreterPath}",
+        "cwd": "${workspaceRoot}",
+        "env": {"PYTHONPATH":"${workspaceRoot}"}, // 添加此项才能解决vscode的python运行目录的问题，否则会无法正常引用当前项目目录中的其他文件
+        "envFile": "${workspaceRoot}/.env"
+    }
+    ]
+  }  
+
+ 

@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "task of build with gcc",
+            //	执行工程文件夹下面的build.sh脚本
+            "command": "sh ${workspaceFolder}/build.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+
+
+    ]
+}

@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/usr/local/cuda/include",
+                "/usr/include",
+                "/usr/include/opencv",
+                "${workspaceFolder}/deploy/utils",
+                "${workspaceFolder}/deploy/backend",
+                "${workspaceFolder}/deploy/postprocess",
+                "${workspaceFolder}/deploy/preprocess",
+                "${workspaceFolder}/deploy/service",
+                "/workspace/lisen/tensorrt/my_tensorrt/third/jsoncpp-src-0.5.0/include"
+                
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "gcc-x64"
+        }
+        
+    ],
+    "version": 4
+}
