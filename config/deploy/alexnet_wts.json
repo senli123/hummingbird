@@ -1,0 +1,55 @@
+{
+  "Preprocess": [
+    {
+      "type": "ResizeWrapper",
+      "params": {
+        "bgr2rgb": true,
+        "keep_ratio": true,
+        "size": [
+          224,
+          224
+        ]
+      }
+    },
+    {
+      "type": "NormalizeWrapper",
+      "params": {
+        "limit": true,
+        "normalize": true,
+        "mean": [
+          0.485,
+          0.456,
+          0.406
+        ],
+        "std": [
+          0.229,
+          0.224,
+          0.225
+        ]
+      }
+    }
+  ],
+  "Infer": [
+    {
+      "type": "TensorrtWrapper",
+      "params": {
+        "input_h": 224,
+        "input_w": 224,
+        "output_size": 1000,
+        "input_name": "data",
+        "output_name": "prob",
+        "engine_path": "/workspace/lisen/tensorrt/my_tensorrt/model_zoo/engine/alexnet_wts.engine",
+        "cuda_id": 0
+      }
+    }
+  ],
+  "Postprocess": [
+    {
+      "type": "ClassifyWrapper",
+      "params": {
+        "class_nums": 1000,
+        "top_nums": 5
+      }
+    }
+  ]
+}

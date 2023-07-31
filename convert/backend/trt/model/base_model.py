@@ -16,7 +16,7 @@ class BaseModel(metaclass = ABCMeta):
                     input_w):
         pass
     @staticmethod
-    def load_weigths(self,wts_path):
+    def load_weights(wts_path):
         
         print(f"Loading weights: {wts_path}")
 

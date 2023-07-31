@@ -1,5 +1,6 @@
 from .model import * 
 import tensorrt as trt
+
 TRT_LOGGER = trt.Logger(trt.Logger.INFO)
 class ModelFactory():
     def build_model(self,name):

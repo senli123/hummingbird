@@ -1,5 +1,6 @@
 from .base_model import BaseModel
 import tensorrt as trt
+from packaging import version
 class alexnet(BaseModel):
     def create_engine(self,
                       builder,
@@ -121,7 +122,10 @@ class alexnet(BaseModel):
 
         # Build Engine
         builder.max_batch_size = max_batch_size
-        builder.max_workspace_size = 1 << 20
+        if version.parse(trt.__version__) < version.parse('8'):
+          builder.max_workspace_size = 1 << 20
+
+        config.max_workspace_size = 1 << 20
         engine = builder.build_engine(network, config)
 
         del network

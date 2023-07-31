@@ -42,8 +42,8 @@ class Pytorch2ir():
         out = net(tmp)
 
         print('output:', out)
-
-        summary(net, dummy_input.shape, device=cuda_id_str)
+        print(dummy_input[0].shape)
+        summary(net, dummy_input[0].shape)
         #return
         f = open(ir_path, 'w')
         f.write("{}\n".format(len(net.state_dict().keys())))

@@ -21,7 +21,7 @@ class TensorrtWrapper(BaseBackend):
     def infer(self,input):
         self.cfx.push()
         self.inputs[0].host = input
-        trt_outputs = do_inference_v2(self.context, bindings=self.bindings, 
+        trt_outputs = do_inference(self.context, bindings=self.bindings, 
                         inputs=self.inputs, outputs=self.outputs, stream=self.stream)
         self.destory()
         return trt_outputs[0]
