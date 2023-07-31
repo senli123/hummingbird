@@ -9,6 +9,7 @@ from backend import onnx2tensorrt, wts2tensorrt, BackendFactory
 from base_preprocess import PreprocessFactory
 from base_postprocess import PostprocessFactory
 import cv2
+import numpy as np
 class Pipeline:
     def __init__(self,pth_path, preprocess_args,postprocess_args,backend_args):
         if os.path.exists(pth_path):
@@ -21,29 +22,41 @@ class Pipeline:
         for cur_preprocess_arg in preprocess_args:
             preprocess_type = cur_preprocess_arg['type']
             preprocess_params = cur_preprocess_arg['params']
-            self.preprocess_pipeline.append(preprocess_factory.create_preprocess(preprocess_type, **preprocess_params))
+            self.preprocess_pipeline.append(preprocess_factory.create_preprocess(preprocess_type, preprocess_params))
         #注册backend
         backend_factory = BackendFactory()
         self.backend_pipeline = []
         for cur_backend_arg in backend_args:
             backend_type = cur_backend_arg['type']
             backend_params = cur_backend_arg['params']
-            self.backend_pipeline.append(backend_factory.create_backend(backend_type, **backend_params))
+            self.backend_pipeline.append(backend_factory.create_backend(backend_type, backend_params))
         #注册postprocess
         postprocess_factory = PostprocessFactory()
         self.postprocess_pipeline = []
         for cur_postprocess_arg in postprocess_args:
             postprocess_type = cur_postprocess_arg['type']
             postprocess_params = cur_postprocess_arg['params']
-            self.postprocess_pipeline.append(postprocess_factory.create_postprocess(postprocess_type, **postprocess_params))
+            self.postprocess_pipeline.append(postprocess_factory.create_postprocess(postprocess_type, postprocess_params))
 
+    def pytorch_infer(self, input_np:np.array):
+        device_id =  next( self.net.parameters()).device
+        tensor = torch.tensor(input_np)
+        if(device_id != 'cpu'):
+            tensor = tensor.to(device_id)
+        pytorch_output = self.net(tensor)
+        if(device_id != 'cpu'):
+            pytorch_output = pytorch_output.cpu()
+        pytorch_output = pytorch_output.detach().numpy()
+        return pytorch_output
     def infer(self, mat:cv2.Mat):
         for preprocess_node in self.preprocess_pipeline:
             mat = preprocess_node.run(mat)
-        pytorch_output = self.net(mat)
+        pytorch_output = self.pytorch_infer(mat)
         backend_output = self.backend_pipeline[0].infer(mat)
-        self.postprocess_pipeline[0].run(pytorch_output)
-        self.postprocess_pipeline[0].run(backend_output)
+        pytorch_index = self.postprocess_pipeline[0].run(pytorch_output)
+        index = self.postprocess_pipeline[0].run(backend_output)
+        print(pytorch_index)
+        print(index)
     def destory(self,):
         self.backend_pipeline[0].destory()
 

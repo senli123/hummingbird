@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 
 class PostprocessFactory():
-    def create_postprocess(self,name,**kwargs):
-        return eval(name)(kwargs) 
+    def create_postprocess(self,name,kwargs):
+        return eval(name)(**kwargs) 
     
 class BasePostprocess(metaclass = ABCMeta):
     

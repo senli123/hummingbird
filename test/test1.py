@@ -41,7 +41,11 @@ def pytorch_infer():
     top_ind = np.argsort(out[0])[-1:][::-1]
     print(top_ind[-1])
 
-
+def check():
+    path = "/workspace/lisen/tensorrt/my_tensorrt/model_zoo/pth/alexnet.pth"
+    model = torch.load(path)
+    net = torchvision.models.alexnet(pretrained=True)
+    print(next(net.parameters()).device)  
 if __name__ == '__main__':
-    pytorch_infer()
+    check()
 

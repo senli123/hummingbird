@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 
 class PreprocessFactory():
-    def create_preprocess(self,name,**kwargs):
-        return eval(name)(kwargs)
+    def create_preprocess(self,name,kwargs):
+        return eval(name)(**kwargs)
     
 class BasePreprocess(metaclass = ABCMeta):
     
@@ -19,6 +19,7 @@ class ResizeWrapper(BasePreprocess):
     def __init__(self,bgr2rgb,size,keep_ratio):
         self.bgr2rgb = bgr2rgb
         self.size = size
+        self.keep_ratio = keep_ratio
     def run(self, mat):
         if self.bgr2rgb:
             mat = cv2.cvtColor(mat, cv2.COLOR_BGR2RGB)
@@ -29,8 +30,8 @@ class ResizeWrapper(BasePreprocess):
     
 class NormalizeWrapper(BasePreprocess):
     def __init__(self,mean,std):
-        self.mean = np.array(mean, dtype= np.float32) * 255
-        self.size = np.reciprocal(np.array(std, dtype= np.float32)* 255, dtype=np.float32)
+        self.mean_array = np.array(mean, dtype= np.float32) * 255
+        self.std_array = np.reciprocal(np.array(std, dtype= np.float32)* 255, dtype=np.float32)
     def run(self, mat):
         mat = np.array(mat, dtype=np.float32, order='C')
         mat -= self.mean_array

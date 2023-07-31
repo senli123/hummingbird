@@ -36,7 +36,7 @@
             }    
         },
         {
-            "type": "Normalize",
+            "type": "NormalizeWrapper",
             "params":{
                 "mean": [
                     0.485, 0.456, 0.406

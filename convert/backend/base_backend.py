@@ -1,5 +1,5 @@
 from abc import ABCMeta,abstractclassmethod
-# from .trt import TensorRTWrapper
+
 class BaseBackend(metaclass = ABCMeta):
     
     @abstractclassmethod
@@ -9,6 +9,3 @@ class BaseBackend(metaclass = ABCMeta):
     def get_name(self):
         pass
 
-class BackendFactory():
-    def create_backend(self,name):
-        return eval(name)()

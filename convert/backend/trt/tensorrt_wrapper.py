@@ -4,14 +4,15 @@ import pycuda.autoinit
 import pycuda.driver as cuda
 from .common import *
 from backend.base_backend import BaseBackend
-class TensorRTWrapper(BaseBackend):
-    def __init__(self,trt_path, gpuID):
-        self.cfx = cuda.Device(gpuID).make_context()
+class TensorrtWrapper(BaseBackend):
+    def __init__(self,engine_path, cuda_id,input_h, 
+                 input_w,output_size,input_name,ouput_name):
+        self.cfx = cuda.Device(cuda_id).make_context()
         self.stream = cuda.Stream()
         TRT_LOGGER = trt.Logger(trt.Logger.INFO)
         trt.init_libnvinfer_plugins(TRT_LOGGER, '')
         runtime = trt.Runtime(TRT_LOGGER)
-        with open(trt_path, 'rb') as f:
+        with open(engine_path, 'rb') as f:
             buf = f.read()
             self.engine = runtime.deserialize_cuda_engine(buf)
         self.context = self.engine.create_execution_context()
@@ -26,6 +27,8 @@ class TensorRTWrapper(BaseBackend):
         return trt_outputs 
     def destory(self):
         self.cfx.pop()
+    def get_name(self):
+        return "TensorrtWrapper"
 
 #         export CPATH=$CPATH:/usr/local/cuda/include
 # export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/cuda/lib64
