@@ -47,20 +47,20 @@ class Pipeline:
         if(device_id != 'cpu'):
             pytorch_output = pytorch_output.cpu()
         pytorch_output = pytorch_output.detach().numpy()
-        return pytorch_output
+        return pytorch_output[0]
     def infer(self, mat:cv2.Mat):
         for preprocess_node in self.preprocess_pipeline:
             mat = preprocess_node.run(mat)
         pytorch_output = self.pytorch_infer(mat)
         backend_output = self.backend_pipeline[0].infer(mat)
-        pytorch_index = self.postprocess_pipeline[0].run(pytorch_output)
-        index = self.postprocess_pipeline[0].run(backend_output)
-        print(pytorch_index)
-        print(index)
+        pytorch_score, pytorch_output_index = self.postprocess_pipeline[0].run(pytorch_output)
+        score, output_index = self.postprocess_pipeline[0].run(backend_output)
+        print(pytorch_score, pytorch_output_index)
+        print(score, output_index)
     def destory(self,):
         self.backend_pipeline[0].destory()
 
-def main(config_json_path,image_path):
+def main(config_json_path,image_path,deploy_json_path):
     if not os.path.exists(config_json_path):
         print("please check your input config_json_path")
         return
@@ -109,8 +109,20 @@ def main(config_json_path,image_path):
         mat = cv2.imread(image_path)
         pipeline.infer(mat)
         pipeline.destory()
+        #保存指定deploy的json到指定路径
+        deploy_json_info= {}
+        deploy_json_info['Preprocess'] = preprocess_info
+        deploy_json_info['Infer'] = infer_info
+        deploy_json_info['Postprocess'] = postprocess_info
+
+        with open(deploy_json_path,'w',encoding='utf8') as f2:
+        # ensure_ascii=False才能输入中文，否则是Unicode字符
+        # indent=2 JSON数据的缩进，美观
+            json.dump(deploy_json_info,f2,ensure_ascii=False,indent=2)
+
 
 
 config_json_path = "/workspace/lisen/tensorrt/my_tensorrt/config/convert/example.json"
+deploy_json_path = "/workspace/lisen/tensorrt/my_tensorrt/config/deploy/alexnet.json"
 image_path = "/workspace/lisen/tensorrt/my_tensorrt/img/dog.jpg"
-main(config_json_path,image_path)
+main(config_json_path,image_path,deploy_json_path)

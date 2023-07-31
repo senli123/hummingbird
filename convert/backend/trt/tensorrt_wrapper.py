@@ -6,7 +6,7 @@ from .common import *
 from backend.base_backend import BaseBackend
 class TensorrtWrapper(BaseBackend):
     def __init__(self,engine_path, cuda_id,input_h, 
-                 input_w,output_size,input_name,ouput_name):
+                 input_w,output_size,input_name,output_name):
         self.cfx = cuda.Device(cuda_id).make_context()
         self.stream = cuda.Stream()
         TRT_LOGGER = trt.Logger(trt.Logger.INFO)
@@ -24,7 +24,7 @@ class TensorrtWrapper(BaseBackend):
         trt_outputs = do_inference_v2(self.context, bindings=self.bindings, 
                         inputs=self.inputs, outputs=self.outputs, stream=self.stream)
         self.destory()
-        return trt_outputs 
+        return trt_outputs[0]
     def destory(self):
         self.cfx.pop()
     def get_name(self):

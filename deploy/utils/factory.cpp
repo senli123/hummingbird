@@ -77,7 +77,7 @@ void* Store::findPostprocessInstance(const std::string& postprocess_name)
 
 void Store::registerPostprocessInstance(const std::string& postprocess_name, register_func postprocess_func)
 {
-    m_register_preprocess[postprocess_name] = postprocess_func;
+    m_register_postprocess[postprocess_name] = postprocess_func;
 }
 
 void Store::getPostprocessKeys()

@@ -20,8 +20,9 @@ class ClassifyWrapper(BasePostprocess):
         self.class_nums = class_nums
         self.top_nums = top_nums
     def run(self, output):
-        output = np.argmax(output)
-        return output
+        output_index = np.argmax(output)
+        score = output[output_index]
+        return score, output_index
     def get_name(self,):
         return "ClassifyWrapper"
     

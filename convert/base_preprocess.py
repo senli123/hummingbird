@@ -29,7 +29,7 @@ class ResizeWrapper(BasePreprocess):
         return "ResizeWrapper"
     
 class NormalizeWrapper(BasePreprocess):
-    def __init__(self,mean,std):
+    def __init__(self,mean,std, limit, normalize):
         self.mean_array = np.array(mean, dtype= np.float32) * 255
         self.std_array = np.reciprocal(np.array(std, dtype= np.float32)* 255, dtype=np.float32)
     def run(self, mat):

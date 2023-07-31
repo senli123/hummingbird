@@ -38,6 +38,8 @@
         {
             "type": "NormalizeWrapper",
             "params":{
+                "limit": true,
+                "normalize":true,
                 "mean": [
                     0.485, 0.456, 0.406
                 ],
@@ -56,7 +58,7 @@
                 "input_w": 224,
                 "output_size": 1000,
                 "input_name":"actual_input_1",
-                "ouput_name":"output1",
+                "output_name":"output1",
                 "engine_path":"/workspace/lisen/tensorrt/my_tensorrt/model_zoo/engine/alexnet.engine",
                 "cuda_id":0
             }    

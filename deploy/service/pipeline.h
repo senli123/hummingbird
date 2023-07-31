@@ -20,8 +20,8 @@ private:
     std::vector<PreprocessInterface*> preprocess_pipeline;
     std::vector<BackendInterface*> backend_model;
     std::vector<PostprocessInterface*> postprocess_pipeline;
-    float* input_buffer;
-    float* output_buffer;
+    float* input_buffer = nullptr;
+    float* output_buffer = nullptr;
     int input_h;
     int input_w;
 };   

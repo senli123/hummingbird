@@ -28,10 +28,10 @@ bool NormalizeWrapper::Init(MapCalcParam& preprocess_input)
         }
         // 输入参数
         
-        std::cerr << "limit: " << _limit;
-        std::cerr << "normalize: " << _normalize;
-        std::cerr << "mean: " << _mean;
-        std::cerr << "std: " << _std;
+        std::cerr << "limit: " << _limit << '\n';
+        std::cerr << "normalize: " << _normalize<< '\n';
+        std::cerr << "mean: " << _mean << '\n';
+        std::cerr << "std: " << _std << '\n';
         
     }
     catch(const std::exception& e)

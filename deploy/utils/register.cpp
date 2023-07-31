@@ -17,7 +17,7 @@ RegisterPreprocess::~RegisterPreprocess(){}
 
 RegisterPostprocess::RegisterPostprocess(std::string postprocess_name, register_func postprocess_func)
 {
-  Store::getInstance()->registerPreprocessInstance(postprocess_name, postprocess_func);
+  Store::getInstance()->registerPostprocessInstance(postprocess_name, postprocess_func);
 }
 RegisterPostprocess::~RegisterPostprocess(){}
 

@@ -209,7 +209,7 @@ bool Pipeline::PhaseParams(Json::Value& infer_info, std::vector<std::pair<std::s
                 Json::Value map_value = param_map[map_key];
                 if (map_value.isBool())
                 {
-                    int value = map_value.asBool();
+                    bool value = map_value.asBool();
                     input.insert({ map_key,value });
                 }
                 else if (map_value.isInt())
