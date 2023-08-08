@@ -7,6 +7,12 @@ class ClassifyWrapper : public PostprocessInterface{
 public:
     virtual bool Init(MapCalcParam& postprocess_input);
     virtual bool Run(float* output);
+    virtual std::vector<InstanceInfo> GetResult()
+    {
+        std::vector<InstanceInfo> result;
+        return result;
+    }
+   
     virtual std::string GetName()
     {
         return "ClassifyWrapper";

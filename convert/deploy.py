@@ -10,10 +10,14 @@ from base_preprocess import PreprocessFactory
 from base_postprocess import PostprocessFactory
 import cv2
 import numpy as np
+from visual import VisualTools
 class Pipeline:
-    def __init__(self,pth_path, preprocess_args,postprocess_args,backend_args):
-        if os.path.exists(pth_path):
-            self.net = torch.load(pth_path)
+    def __init__(self,pytorch_infer_open, pth_path, preprocess_args,postprocess_args,backend_args,visual_args):
+        if pytorch_infer_open:
+            if os.path.exists(pth_path):
+                self.net = torch.load(pth_path)
+            else:
+                self.net = None
         else:
             self.net = None
         #注册preprocess
@@ -37,7 +41,10 @@ class Pipeline:
             postprocess_type = cur_postprocess_arg['type']
             postprocess_params = cur_postprocess_arg['params']
             self.postprocess_pipeline.append(postprocess_factory.create_postprocess(postprocess_type, postprocess_params))
-
+        #判断可视化类型
+        self.visual_type = visual_args['type']
+        visual_class = VisualTools()
+        self.visual_func = getattr(visual_class,self.visual_type)
     def pytorch_infer(self, input_np:np.array):
         device_id =  next( self.net.parameters()).device
         tensor = torch.tensor(input_np)
@@ -49,14 +56,18 @@ class Pipeline:
         pytorch_output = pytorch_output.detach().numpy()
         return pytorch_output[0]
     def infer(self, mat:cv2.Mat):
+        origin_mat = mat
         for preprocess_node in self.preprocess_pipeline:
             mat = preprocess_node.run(mat)
-        pytorch_output = self.pytorch_infer(mat)
         backend_output = self.backend_pipeline[0].infer(mat)
-        pytorch_score, pytorch_output_index = self.postprocess_pipeline[0].run(pytorch_output)
-        score, output_index = self.postprocess_pipeline[0].run(backend_output)
-        print(pytorch_score, pytorch_output_index)
-        print(score, output_index)
+        backend_result = self.postprocess_pipeline[0].run(backend_output)
+        self.visual_func(origin_mat,mat,backend_result)
+        if(self.net != None):
+            pytorch_output = self.pytorch_infer(mat)
+            pytorch_result = self.postprocess_pipeline[0].run(pytorch_output)
+            self.visual_func(origin_mat,mat,pytorch_result)
+        
+        
     def destory(self,):
         self.backend_pipeline[0].destory()
 
@@ -72,9 +83,12 @@ def main(config_json_path,image_path,deploy_json_path):
         preprocess_info = config_info['Preprocess']
         infer_info = config_info['Infer']
         postprocess_info = config_info['Postprocess']
+        visual_info = config_info['visual']
         #检查针对当前这种backcend，该convert类型是否支持
         backend_type = infer_info[0]['type']
         convert_type = convert_info['type']
+        #是否进行pytorch的推断
+        pytorch_infer_open = convert_info['open']
         if backend_type not in BACKEND_IR_DICT.keys():
             print("we do not support this backend:{0}".format(backend_type))
             return
@@ -105,7 +119,7 @@ def main(config_json_path,image_path,deploy_json_path):
                 wts2tensorrt(**backend_convert_params)
 
         #转换成功之后创建推理pipeline，检查转换的结果
-        pipeline = Pipeline(pth_path, preprocess_info,postprocess_info,infer_info)
+        pipeline = Pipeline(pytorch_infer_open,pth_path, preprocess_info,postprocess_info,infer_info,visual_info)
         mat = cv2.imread(image_path)
         pipeline.infer(mat)
         pipeline.destory()
@@ -114,6 +128,7 @@ def main(config_json_path,image_path,deploy_json_path):
         deploy_json_info['Preprocess'] = preprocess_info
         deploy_json_info['Infer'] = infer_info
         deploy_json_info['Postprocess'] = postprocess_info
+        deploy_json_info['visual'] = visual_info
 
         with open(deploy_json_path,'w',encoding='utf8') as f2:
         # ensure_ascii=False才能输入中文，否则是Unicode字符
@@ -122,7 +137,7 @@ def main(config_json_path,image_path,deploy_json_path):
 
 
 
-config_json_path = "/workspace/lisen/tensorrt/my_tensorrt/config/convert/example.json"
-deploy_json_path = "/workspace/lisen/tensorrt/my_tensorrt/config/deploy/alexnet.json"
-image_path = "/workspace/lisen/tensorrt/my_tensorrt/img/dog.jpg"
+config_json_path = "/workspace/lisen/tensorrt/my_tensorrt/config/convert/yolov5s.json"
+deploy_json_path = "/workspace/lisen/tensorrt/my_tensorrt/config/deploy/yolov5s.json"
+image_path = "/workspace/lisen/tensorrt/my_tensorrt/img/bus.jpg"
 main(config_json_path,image_path,deploy_json_path)

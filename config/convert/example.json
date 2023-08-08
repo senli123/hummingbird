@@ -73,5 +73,8 @@
 
             }
         }
-    ]
+    ],
+    "visual":{
+        "type": "classify"
+    }
 }

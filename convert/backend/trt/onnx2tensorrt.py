@@ -24,7 +24,7 @@ def onnx2tensorrt(  onnx_path: str,
                     int8_param: Optional[dict] = None,
                   ):
     max_workspace_size = 1 << 28 
-    input_shapes = {"min_shape":[1,3,224,224],"opt_shape":[4,3,224,224],"max_shape":[8,3,224,224]}
+    # input_shapes = {"min_shape":[1,3,224,224],"opt_shape":[4,3,224,224],"max_shape":[8,3,224,224]}
     os.environ['CUDA_DEVICE'] = str(device_id)
     #加载plugin算子
     load_tensorrt_plugin()

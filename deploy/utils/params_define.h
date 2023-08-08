@@ -44,6 +44,21 @@ T GetParam(ValueType& val, const T& Def)
     //}
     return Def;
 }
+
+//一个类别实例的结构体
+typedef struct tag_InstanceInfo 
+{
+	cv::Rect rect; //(x,y,w,h)左上和长宽
+	float score;            
+	int class_id;   
+} InstanceInfo;
+//方便用于在nms操作
+typedef struct tag_ClassInfo 
+{
+	cv::Rect o_rect; //(x,y,w,h) 左上和长款
+	float o_rect_cof;
+} ClassInfo;
+
 } // namespace Engine
 
 #endif

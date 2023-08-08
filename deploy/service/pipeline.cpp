@@ -9,7 +9,7 @@ bool Pipeline::CreatePipeline(std::string& json_path)
     std::vector<std::pair<std::string, MapCalcParam>> preprocess_info;
     std::vector<std::pair<std::string, MapCalcParam>> backend_info;
     std::vector<std::pair<std::string, MapCalcParam>> postprocess_info;
-    if(!this->PhaseJson(json_path,preprocess_info,backend_info,postprocess_info)){
+    if(!this->PhaseJson(json_path,preprocess_info,backend_info,postprocess_info,this->visual_type)){
         std::cerr << "PhaseJson failed " << '\n';
         return false;
     }
@@ -79,12 +79,14 @@ bool Pipeline::CreatePipeline(std::string& json_path)
 }
 bool Pipeline::RunPipeline(std::string& image_path)
 {
-    cv::Mat image = cv::imread(image_path); 
+    
+    cv::Mat src_img = cv::imread(image_path); 
+    cv::Mat image = src_img.clone(); 
     //循环调用已经注册的preprocess
     for (auto register_preprocess: preprocess_pipeline) {
 		if(!register_preprocess->Run(image))
         {
-            std::cerr << "preprocess_node: "<< register_preprocess->GetName() << "run failed" << '\n';
+            std::cerr << "preprocess_node: "<< register_preprocess->GetName() << " run failed" << '\n';
             return false;
         }
 	}
@@ -108,6 +110,12 @@ bool Pipeline::RunPipeline(std::string& image_path)
     {
         std::cerr << "postprocess_node: "<< this->postprocess_pipeline[0]->GetName() << "run failed" << '\n';
         return false;
+    }
+    //根据任务的不同调用不同的可视化方法
+    if(this->visual_type == "detection")
+    {
+         std::vector<InstanceInfo> detection_result = this->postprocess_pipeline[0]->GetResult();
+         Engine::VisualTools::get_instance().detectionVisual(src_img,this->input_w,this->input_h,detection_result);
     }
     return true;
     
@@ -150,7 +158,8 @@ bool Pipeline::DestroyPipeline()
 bool Pipeline::PhaseJson(std::string& json_path, 
         std::vector<std::pair<std::string, MapCalcParam>>& preprocess_info,
         std::vector<std::pair<std::string, MapCalcParam>>& backend_info,
-        std::vector<std::pair<std::string, MapCalcParam>>& postprocess_info)
+        std::vector<std::pair<std::string, MapCalcParam>>& postprocess_info,
+        std::string& visual_type)
 {
     try
     {
@@ -163,6 +172,7 @@ bool Pipeline::PhaseJson(std::string& json_path,
             Json::Value preprocess_info_json = root["Preprocess"];
             Json::Value backend_info_json = root["Infer"];
             Json::Value postprocess_info_json = root["Postprocess"];
+            Json::Value visual_info_json = root["visual"];
             if(!this->PhaseParams(preprocess_info_json, preprocess_info))
             {
                 std::cerr << "please check your preprocess" << '\n';
@@ -177,7 +187,10 @@ bool Pipeline::PhaseJson(std::string& json_path,
             {
                 std::cerr << "please check your postprocess" << '\n';
                 return false;
-            }   
+            }
+            Json::Value type_json = visual_info_json["type"];
+            visual_type = type_json.asCString();
+           
 
             return true;
 

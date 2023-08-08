@@ -9,6 +9,7 @@ public:
     virtual bool Init(MapCalcParam& postprocess_input) = 0;
     virtual bool Run(float* output) = 0;
     virtual std::string GetName() = 0;
+    virtual std::vector<InstanceInfo> GetResult() = 0;
 };
 }
 
