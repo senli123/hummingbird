@@ -124,7 +124,7 @@ class Yolov5PostprocessWrapper(BasePostprocess):
         classes = None
         max_det=300
         multi_label = False
-        prediction = prediction.reshape(1,25200,85)
+        prediction = prediction.reshape(1,6400,75)
         prediction = torch.from_numpy(prediction)
         if isinstance(prediction, (list, tuple)):  # YOLOv5 model in validation model, output = (inference_out, loss_out)
             prediction = prediction[0]  # select only inference output

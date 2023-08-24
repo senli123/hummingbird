@@ -102,7 +102,12 @@
         "stack": "cpp",
         "numbers": "cpp",
         "semaphore": "cpp",
-        "__functional_03": "cpp"
+        "__functional_03": "cpp",
+        "__hash_table": "cpp",
+        "__tree": "cpp",
+        "__bit_reference": "cpp",
+        "netfwd": "cpp",
+        "__locale": "cpp"
     },
     "python.linting.pylintArgs": [
         "/home/lisen/.local/lib/python3.7/site-packages/pylint",

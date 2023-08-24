@@ -137,7 +137,7 @@ def main(config_json_path,image_path,deploy_json_path):
 
 
 
-config_json_path = "/workspace/lisen/tensorrt/my_tensorrt/config/convert/yolov5s.json"
-deploy_json_path = "/workspace/lisen/tensorrt/my_tensorrt/config/deploy/yolov5s.json"
+config_json_path = "/workspace/lisen/tensorrt/my_tensorrt/config/convert/yolov5s_mob.json"
+deploy_json_path = "/workspace/lisen/tensorrt/my_tensorrt/config/deploy/yolov5s_mob.json"
 image_path = "/workspace/lisen/tensorrt/my_tensorrt/img/bus.jpg"
 main(config_json_path,image_path,deploy_json_path)

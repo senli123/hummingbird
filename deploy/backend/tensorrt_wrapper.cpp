@@ -101,10 +101,11 @@ bool TensorrtWrapper::Init(MapCalcParam& backend_input)
         std::cerr << "m_input_cpu_buffer == nullptr || m_output_cpu_buffer == nullptr" << std::endl;
         return false;
     }
-    if(m_engine->getNbBindings() != 2) {
-        std::cerr << "m_engine->getNbBindings() != 2" << std::endl;
-        return false;
-    }
+    int32_t num = m_engine->getNbBindings();
+    // if(m_engine->getNbBindings() != 2) {
+    //     std::cerr << "m_engine->getNbBindings() != 2" << std::endl;
+    //     return false;
+    // }
 
     m_input_index = m_engine->getBindingIndex(m_input_name.c_str());
     m_output_index = m_engine->getBindingIndex(m_output_name.c_str());
@@ -137,7 +138,11 @@ bool TensorrtWrapper::Infer(float* inputs, float* outputs)
 {
     cudaSetDevice(m_cuda_id);
     CUDA_CHECK(cudaMemcpyAsync(gpu_buffers[m_input_index], inputs, m_input_h * m_input_w * m_channels * m_batch_size * sizeof(float), cudaMemcpyHostToDevice, m_stream));
+    //auto infer_start = std::chrono::system_clock::now();
     m_context->enqueue(m_batch_size, gpu_buffers, m_stream, nullptr);
+    //auto infer_end = std::chrono::system_clock::now();
+    // auto preprocess_end = std::chrono::system_clock::now();
+    //std::cout << "infer time: " << std::chrono::duration_cast<std::chrono::milliseconds>(infer_end - infer_start).count() << "ms" << std::endl;
     CUDA_CHECK(cudaMemcpyAsync(outputs, gpu_buffers[m_output_index], m_output_size * sizeof(float), cudaMemcpyDeviceToHost, m_stream));
     cudaStreamSynchronize(m_stream);
     return true;

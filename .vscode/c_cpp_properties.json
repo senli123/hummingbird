@@ -11,7 +11,10 @@
                 "${workspaceFolder}/deploy/postprocess",
                 "${workspaceFolder}/deploy/preprocess",
                 "${workspaceFolder}/deploy/service",
-                "/workspace/lisen/tensorrt/my_tensorrt/third/jsoncpp-src-0.5.0/include"
+                "/workspace/lisen/package/opt/nvidia/cvcuda0/include",
+                "/workspace/lisen/tensorrt/my_tensorrt/third/jsoncpp-src-0.5.0/include",
+                "/workspace/lisen/tensorrt/my_tensorrt/third_backend/onnxruntime-linux-x64-gpu-1.15.1/include",
+                "/workspace/lisen/tensorrt/my_tensorrt/third_backend/ncnn/build/install/include/"
                 
             ],
             "defines": [],

@@ -14,7 +14,7 @@ void VisualTools::detectionVisual(cv::Mat& image, int resize_w, int resize_h, st
         this->Update_coords(img_width, img_height, resize_w, resize_h, rect);
         //输出
         std::cerr << "------------------------"<< '\n';
-        std::cerr << "rect(xy,w,h): "<< rect.x  << ","<< rect.y << ","<< rect.width << ","<< rect.height << '\n';
+        std::cerr << "rect(x,y,w,h): "<< rect.x  << ","<< rect.y << ","<< rect.width << ","<< rect.height << '\n';
         std::cerr << "score: "<< score << '\n';
         std::cerr << "class_id: "<< class_id << '\n';
         
@@ -28,7 +28,7 @@ void VisualTools::detectionVisual(cv::Mat& image, int resize_w, int resize_h, st
         cv::putText(image, std::to_string(class_id), class_point, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 0), 1, 8, 0);
 		cv::putText(image, std::to_string(score), score_point, cv::FONT_HERSHEY_COMPLEX, 0.5,cv::Scalar(0, 0, 255), 1, 8, 0);
     }
-    cv::imwrite("/workspace/lisen/tensorrt/my_tensorrt/img/output/bus.jpg",image);
+    cv::imwrite("/workspace/lisen/tensorrt/my_tensorrt/img/output/bus1.jpg",image);
 }
 
 bool VisualTools::Update_coords(int img_width, int img_height, int resize_w, int resize_h, cv::Rect &rect)

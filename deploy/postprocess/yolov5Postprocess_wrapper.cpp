@@ -41,8 +41,10 @@ bool Yolov5PostprocessWrapper::Run(float* output)
     for (int batch_index = 0; batch_index < batch_size; batch_index++)
     {
         int cur_batch_start_index = batch_index * 25200*85;
+        // int cur_batch_start_index = batch_index * 6400*85;
         //循环所有的框
         for(int bbox_index = 0; bbox_index < 25200; bbox_index++)
+        //  for(int bbox_index = 0; bbox_index < 6400; bbox_index++)
         {
             int cur_bbox_index = cur_batch_start_index + bbox_index* 85;
             //先得到当前框的score，进行第一次筛选
@@ -55,6 +57,7 @@ bool Yolov5PostprocessWrapper::Run(float* output)
             double max_score = 0.0;
             int max_index = 0;
             for(int i = 0; i < 80; i++)
+            //  for(int i = 0; i < 70; i++)
             {
                 double cur_score = output[cur_bbox_index + 5 + i];
                 if (cur_score > max_score)

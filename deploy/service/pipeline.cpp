@@ -81,7 +81,8 @@ bool Pipeline::RunPipeline(std::string& image_path)
 {
     
     cv::Mat src_img = cv::imread(image_path); 
-    cv::Mat image = src_img.clone(); 
+    cv::Mat image = src_img.clone();
+    auto preprocess_start = std::chrono::system_clock::now(); 
     //循环调用已经注册的preprocess
     for (auto register_preprocess: preprocess_pipeline) {
 		if(!register_preprocess->Run(image))
@@ -97,26 +98,34 @@ bool Pipeline::RunPipeline(std::string& image_path)
         this->input_buffer[i + this->input_h * this->input_w] = image.at<cv::Vec3f>(i)[1];
         this->input_buffer[i + 2 * this->input_h* this->input_w] = image.at<cv::Vec3f>(i)[2];
     }
-
+    auto preprocess_end = std::chrono::system_clock::now();
+    std::cout << "preprocess time: " << std::chrono::duration_cast<std::chrono::milliseconds>(preprocess_end - preprocess_start).count() << "ms" << std::endl;
     //运行backend的推断
+    auto infer_start = std::chrono::system_clock::now(); 
     if(!this->backend_model[0]->Infer(this->input_buffer,this->output_buffer))
     {
         std::cerr << "infer_node: "<< this->backend_model[0]->GetName() << "run failed" << '\n';
         return false;
     }
-
+    auto infer_end = std::chrono::system_clock::now();
+    std::cout << "infer time: " << std::chrono::duration_cast<std::chrono::milliseconds>(infer_end - infer_start).count() << "ms" << std::endl;
+  
     //运行后处理
+    auto post_start = std::chrono::system_clock::now(); 
     if(!this->postprocess_pipeline[0]->Run(this->output_buffer))
     {
         std::cerr << "postprocess_node: "<< this->postprocess_pipeline[0]->GetName() << "run failed" << '\n';
         return false;
     }
+    auto post_end = std::chrono::system_clock::now();
+    std::cout << "post time: " << std::chrono::duration_cast<std::chrono::milliseconds>(post_end - post_start).count() << "ms" << std::endl;
+  
     //根据任务的不同调用不同的可视化方法
-    if(this->visual_type == "detection")
-    {
-         std::vector<InstanceInfo> detection_result = this->postprocess_pipeline[0]->GetResult();
-         Engine::VisualTools::get_instance().detectionVisual(src_img,this->input_w,this->input_h,detection_result);
-    }
+    // if(this->visual_type == "detection")
+    // {
+    //      std::vector<InstanceInfo> detection_result = this->postprocess_pipeline[0]->GetResult();
+    //      Engine::VisualTools::get_instance().detectionVisual(src_img,this->input_w,this->input_h,detection_result);
+    // }
     return true;
     
 }

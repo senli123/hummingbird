@@ -10,5 +10,8 @@ set(CMAKE_BUILD_TYPE Debug)
 
 project(my_engine)
 option(BUILD_BACKEND_TENSORRT "Build tensorrt" ON)
-option(BUILD_BACKEND_NCNN "Build ncnn"  OFF)
+option(BUILD_BACKEND_NCNN "Build ncnn"  ON)
+option(BUILD_BACKEND_ONNXRUNTIME "Build onnxruntime"  ON)
+option(NCNN_VULKAN "Build onnxruntime"  OFF)
+
 add_subdirectory(deploy)

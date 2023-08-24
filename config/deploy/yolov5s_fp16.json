@@ -1,0 +1,44 @@
+{
+  "Preprocess": [
+    {
+      "type": "Yolov5PreprocessWrapper",
+      "params": {
+        "input_h": 640,
+        "input_w": 640,
+        "color": [
+          114,
+          114,
+          114
+        ],
+        "stride": 32
+      }
+    }
+  ],
+  "Infer": [
+    {
+      "type": "TensorrtWrapper",
+      "params": {
+        "input_h": 640,
+        "input_w": 640,
+        "output_size": 2142000,
+        "input_name": "images",
+        "output_name": "output0",
+        "engine_path": "/workspace/lisen/tensorrt/my_tensorrt/model_zoo/engine/yolov5s_fp16.engine",
+        "cuda_id": 0
+      }
+    }
+  ],
+  "Postprocess": [
+    {
+      "type": "Yolov5PostprocessWrapper",
+      "params": {
+        "class_nums": 80,
+        "conf_thres": 0.25,
+        "iou_thres": 0.45
+      }
+    }
+  ],
+  "visual": {
+    "type": "detection"
+  }
+}

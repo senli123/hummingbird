@@ -4,6 +4,8 @@
 #include "create_interface.h"
 #include <opencv2/opencv.hpp>
 #include "visual_tools.h"
+#include <iostream>
+#include <fstream>
 namespace Engine
 {
 class Pipeline{

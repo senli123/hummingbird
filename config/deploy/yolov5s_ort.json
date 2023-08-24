@@ -1,0 +1,41 @@
+{
+  "Preprocess": [
+    {
+      "type": "Yolov5PreprocessWrapper",
+      "params": {
+        "bgr2rgb":true,
+        "input_h": 640,
+        "input_w": 640,
+        "color": [
+          114,
+          114,
+          114
+        ],
+        "stride": 32
+      }
+    }
+  ],
+  "Infer": [
+    {
+      "type": "OrtWrapper",
+      "params": {
+        "output_size": 2142000,
+        "model_path": "/workspace/lisen/tensorrt/my_tensorrt/model_zoo/onnx/yolov5s_ort.onnx",
+        "cuda_id": "cpu"
+      }
+    }
+  ],
+  "Postprocess": [
+    {
+      "type": "Yolov5OrtPostprocessWrapper",
+      "params": {
+        "class_nums": 80,
+        "conf_thres": 0.25,
+        "iou_thres": 0.45
+      }
+    }
+  ],
+  "visual": {
+    "type": "detection"
+  }
+}

@@ -16,3 +16,6 @@
 /debug/
 /img/
 /model_zoo/
+/third/
+/third_backend/
+/CV-CUDA/

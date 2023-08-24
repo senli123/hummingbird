@@ -42,6 +42,10 @@ if(BUILD_BACKEND_NCNN)
     list(APPEND HDRS ${CMAKE_CURRENT_SOURCE_DIR}/backend/ncnn_wrapper.h)
 endif()
 
+if (BUILD_BACKEND_ONNXRUNTIME)
+list(APPEND SRCS ${CMAKE_CURRENT_SOURCE_DIR}/backend/ort_wrapper.cpp)
+list(APPEND HDRS ${CMAKE_CURRENT_SOURCE_DIR}/backend/ort_wrapper.h)
+endif()
 
 #添加service
 file(GLOB_RECURSE SRC_SERVICE_FILES
@@ -57,6 +61,15 @@ add_library(Engine SHARED ${SRCS})
 target_include_directories(Engine PUBLIC ${HDRS})
 
 #根据不同的backend链接不同的库文件
+if(BUILD_BACKEND_ONNXRUNTIME)
+set(ONNXRUNTIME_head_DIR /workspace/lisen/tensorrt/my_tensorrt/third_backend/onnxruntime-linux-x64-gpu-1.15.1/include)
+    set(ONNXRUNTIME_lib_DIR /workspace/lisen/tensorrt/my_tensorrt/third_backend/onnxruntime-linux-x64-gpu-1.15.1/lib)
+    message(STATUS "ONNXRUNTIME_head_DIR: ${ONNXRUNTIME_head_DIR}")
+    message(STATUS "ONNXRUNTIME_lib_DIR: ${ONNXRUNTIME_lib_DIR}")
+    target_include_directories(Engine PUBLIC "${ONNXRUNTIME_head_DIR}")
+    target_link_libraries(Engine PUBLIC "${ONNXRUNTIME_lib_DIR}/libonnxruntime.so")
+endif()
+
 if(BUILD_BACKEND_TENSORRT)
     option(CUDA_USE_STATIC_CUDA_RUNTIME OFF)
     # TODO(Call for PR): make cmake compatible with Windows
@@ -73,6 +86,18 @@ if(BUILD_BACKEND_TENSORRT)
     target_link_libraries(Engine PUBLIC nvinfer)
     target_link_libraries(Engine PUBLIC /usr/local/cuda/lib64/libcudart.so.12)
 endif()
+
+if(BUILD_BACKEND_NCNN)
+# set(NCNN_head_DIR /workspace/lisen/tensorrt/my_tensorrt/third_backend/ncnn/build/install/include)
+#     set(NCNN_lib_DIR /workspace/lisen/tensorrt/my_tensorrt/third_backend/ncnn/build/install/lib)
+    set(NCNN_head_DIR /workspace/lisen/tensorrt/my_tensorrt/third_backend/ncnn/build/install/include)
+    set(NCNN_lib_DIR /workspace/lisen/tensorrt/my_tensorrt/third_backend/ncnn/build/install/lib)
+    
+    message(STATUS "NCNN_head_DIR: ${NCNN_head_DIR}")
+    message(STATUS "NCNN_lib_DIR: ${NCNN_lib_DIR}")
+    target_include_directories(Engine PUBLIC "${NCNN_head_DIR}")
+    target_link_libraries(Engine PUBLIC "${NCNN_lib_DIR}/libncnnd.so.1.0.20230824")
+endif()
 # opencv
 find_package(OpenCV)
 message(STATUS "Find opencv include at ${OpenCV_INCLUDE_DIRS}")
@@ -83,10 +108,15 @@ target_link_libraries(Engine PUBLIC ${OpenCV_LIBRARIES})
 #--------------------json---------------------------------
 set(json_INCLUDE_DIR "/workspace/lisen/tensorrt/my_tensorrt/third/jsoncpp-src-0.5.0/include")
 set(json_LIBRARIES "/workspace/lisen/tensorrt/my_tensorrt/third/jsoncpp-src-0.5.0/libs/linux-gcc-5.4.0/libjson_linux-gcc-5.4.0_libmt.so")
-target_include_directories(Engine PUBLIC ${json_INCLUDE_DIR})
-target_link_libraries(Engine PUBLIC ${json_LIBRARIES})
 
+#----------------cv-cuda----------------
+set(CVCUDA_INCLUDE_DIR "/workspace/lisen/package/opt/nvidia/cvcuda0/include")
+set(CVCUDA_LIBRARIES "/workspace/lisen/package/opt/nvidia/cvcuda0/lib/x86_64-linux-gnu")
 
+target_include_directories(Engine PUBLIC ${json_INCLUDE_DIR} ${CVCUDA_INCLUDE_DIR})
+target_link_libraries(Engine PUBLIC ${json_LIBRARIES} ${CVCUDA_LIBRARIES})
+
+include_directories( /workspace/lisen/tensorrt/my_tensorrt/CV-CUDA/samples)
 add_executable(demo ${CMAKE_CURRENT_SOURCE_DIR}/demo/test.cpp)
 target_link_libraries(demo PUBLIC Engine)
 

@@ -1,0 +1,73 @@
+{   "Convert":{
+        "open":false,
+        "type":"torch2onnx",
+        "params":{
+             "pth_path": "/workspace/lisen/tensorrt/my_tensorrt/model_zoo/pth/yolov5s.pt",
+             "input_shape": [1,3,640,640],
+               "ir_path":"/workspace/lisen/tensorrt/my_tensorrt/model_zoo/onnx/best_dmvocs.onnx",
+               "input_names": [ "images" ],
+               "output_names": [ "output" ],
+               "dynamic_axes":true,
+               "verbose":true
+        } 
+    },
+    "BackendConvert":{
+        "type":"onnx2tensorrt",
+        "params":{
+            "onnx_path":"/workspace/lisen/tensorrt/my_tensorrt/model_zoo/onnx/best_dmvocs.onnx",
+            "output_file_prefix":"/workspace/lisen/tensorrt/my_tensorrt/model_zoo/engine/best_dmvocs",
+            "input_shapes": {
+                "images":{
+                    "min_shape":[1,3,640,640],
+                    "opt_shape":[4,3,640,640],
+                    "max_shape":[8,3,640,640]
+                }
+               
+            },
+            "max_workspace_size":0, 
+                    "device_id":0, 
+                    "fp16_mode":false, 
+                    "int8_mode":false, 
+                    "int8_param":false
+        } 
+    },
+    "Preprocess":[
+        {
+            "type": "Yolov5PreprocessWrapper",
+            "params":{
+                "input_h":640,
+                "input_w":640,
+                "color":[114,114,114],
+                "stride":32
+            }    
+        }
+    ],
+    "Infer":[
+        {
+            "type":"TensorrtWrapper",
+            "params":{
+                "input_h": 640,
+                "input_w": 640,
+                "output_size": 480000,
+                "input_name":"images",
+                "output_name":"output",
+                "engine_path":"/workspace/lisen/tensorrt/my_tensorrt/model_zoo/engine/yolov5s_prune.engine",
+                "cuda_id":0
+            }    
+        }
+    ],
+    "Postprocess":[
+        {
+            "type": "Yolov5PostprocessWrapper",
+            "params":{
+                "class_nums":70,
+                "conf_thres":0.25,
+                "iou_thres":0.45
+
+            }
+        }
+    ],
+    "visual":{
+        "type": "detection"
+    }
+}
